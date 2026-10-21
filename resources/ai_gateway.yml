@@ -1,0 +1,61 @@
+# Unity Gateway in front of Groq, as two Unity Catalog objects (DABs Beta resources):
+#
+#   model_provider_services.groq  -> holds Groq's base URL + API key, allowlists upstream models
+#   model_services.gpt_oss        -> what the App calls: <catalog>.filings.gpt-oss
+#
+# Why not a model_serving_endpoints external_model: its `name` field rejects "/" (400
+# INVALID_PARAMETER_VALUE), and every usable Groq model ID has one (openai/gpt-oss-120b).
+# Provider-service targets accept provider-native IDs. See docs/DEPLOYMENT_GUIDE.md 5.2b.
+#
+# The Groq key is injected at deploy time as BUNDLE_VAR_groq_api_key — cd.yml reads it from
+# Azure Key Vault after the OIDC login — so it never lands in source control. Guardrails
+# (service policies) are attached in the Unity Gateway UI.
+#
+# Grants: CD deploys as the GitHub OIDC service principal, so it OWNS both objects — and in
+# Unity Catalog you can't even see an object you hold no privilege on. So each deploy grants
+# the human admin (var.admin_user) MANAGE, and the App's own service principal EXECUTE on the
+# model service (definer's privileges: it needs nothing on the provider service).
+
+resources:
+  model_provider_services:
+    groq:
+      parent: schemas/${var.catalog}.filings
+      model_provider_service_id: groq
+      comment: Groq's OpenAI-compatible API (key injected from Azure Key Vault at deploy time)
+      config:
+        provider_type: EXTERNAL_MODEL_PROVIDER_TYPE_CUSTOM
+        targets:
+          - model: openai/gpt-oss-120b
+            native_api_types: [openai/v1/chat/completions]
+        custom:
+          direct:
+            # CUSTOM posts to this URL verbatim (no path appended), so it must be the full
+            # chat-completions endpoint, not the /openai/v1 base.
+            base_url: https://api.groq.com/openai/v1/chat/completions
+            api_key:
+              plaintext: ${var.groq_api_key}
+      grants:
+        - principal: ${var.admin_user}
+          privileges: [MANAGE, EXECUTE]
+
+  model_services:
+    gpt_oss:
+      parent: schemas/${var.catalog}.filings
+      model_service_id: gpt-oss
+      comment: PolicyPilot's governed LLM — routes to Groq gpt-oss-120b via the groq provider service
+      config:
+        routing:
+          destinations:
+            - name: primary
+              destination_type: DESTINATION_TYPE_EXTERNAL_FOUNDATION_MODEL
+              external_model_config:
+                model_provider_service: model-provider-services/${var.catalog}.filings.groq
+                target:
+                  model: openai/gpt-oss-120b
+                  native_api_types: [openai/v1/chat/completions]
+              traffic_percentage: 100
+      grants:
+        - principal: ${var.admin_user}
+          privileges: [MANAGE, EXECUTE]
+        - principal: ${resources.apps.policypilot_app.service_principal_client_id}
+          privileges: [EXECUTE]

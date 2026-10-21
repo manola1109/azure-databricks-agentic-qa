@@ -1,0 +1,57 @@
+# Databricks Asset Bundle for PolicyPilot.
+#
+# `dev` target is real and deployable (workspace, Unity Catalog, Key Vault, GitHub OIDC
+# all provisioned — see README "Status"). `staging`/`prod` hosts and run-as service
+# principals are still placeholders for a future milestone.
+
+bundle:
+  name: policypilot
+
+include:
+  - resources/apps.yml
+  - resources/ai_gateway.yml
+  # No scheduled ingestion job: the UC table is seeded via notebooks/seed_chunks_table.py.
+
+variables:
+  catalog:
+    description: Unity Catalog catalog name for this environment
+    default: topsecretcatalog
+  groq_api_key:
+    description: >-
+      Groq API key for the Unity Gateway model provider service (resources/ai_gateway.yml).
+      No default on purpose — CD sets BUNDLE_VAR_groq_api_key from Azure Key Vault; never commit it.
+  admin_user:
+    description: >-
+      Your Databricks username (email). Gets MANAGE on the Unity Gateway provider/model services
+      that CD's service principal owns — otherwise they're invisible to you in the UI.
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host:  https://adb-7405614181918800.0.azuredatabricks.net
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: topsecretcatalog
+      admin_user: yashstudy02@gmail.com
+
+  staging:
+    mode: production
+    workspace:
+      host: <REPLACE_WITH_STAGING_WORKSPACE_URL>
+      root_path: /Bundles/${bundle.name}/${bundle.target}
+    variables:
+      catalog: policypilot_staging
+    run_as:
+      service_principal_name: <REPLACE_WITH_STAGING_RUN_AS_SP>
+
+  prod:
+    mode: production
+    workspace:
+      host: <REPLACE_WITH_PROD_WORKSPACE_URL>
+      root_path: /Bundles/${bundle.name}/${bundle.target}
+    variables:
+      catalog: policypilot_prod
+    run_as:
+      service_principal_name: <REPLACE_WITH_PROD_RUN_AS_SP>
