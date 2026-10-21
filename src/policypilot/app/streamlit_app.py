@@ -50,6 +50,11 @@ if llm is None:
     )
     st.stop()
 
+def _escape_md(text: str) -> str:
+    """Escape `$` so dollar amounts in filings aren't rendered as LaTeX math."""
+    return text.replace("$", r"\$")
+
+
 def _render_sources(results) -> None:
     """Map each [n] citation in the answer back to the filing it actually came from."""
     if not results:
@@ -62,7 +67,7 @@ def _render_sources(results) -> None:
                 f"{m.get('filing_date', 'unknown date')} "
                 f"(accession {m.get('accession_number', 'unknown')})"
             )
-            st.caption(r.text[:300] + ("…" if len(r.text) > 300 else ""))
+            st.caption(_escape_md(r.text[:300]) + ("…" if len(r.text) > 300 else ""))
 
 
 if "history" not in st.session_state:
@@ -70,7 +75,7 @@ if "history" not in st.session_state:
 
 for turn in st.session_state.history:
     with st.chat_message(turn["role"]):
-        st.markdown(turn["content"])
+        st.markdown(_escape_md(turn["content"]))
         _render_sources(turn.get("sources"))
 
 if question := st.chat_input("Ask a question about the ingested filings..."):
@@ -84,7 +89,7 @@ if question := st.chat_input("Ask a question about the ingested filings..."):
         answer = result["final_answer"]
         grounded = result.get("grounded")
         results = result.get("results") if grounded else None
-        st.markdown(answer)
+        st.markdown(_escape_md(answer))
         if not grounded:
             st.caption("⚠️ No grounded citation found — refused rather than guessing.")
         _render_sources(results)

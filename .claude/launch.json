@@ -6,6 +6,12 @@
       "runtimeExecutable": "uv",
       "runtimeArgs": ["run", "streamlit", "run", "src/policypilot/app/streamlit_app.py", "--server.headless=true", "--server.port=8600"],
       "port": 8600
+    },
+    {
+      "name": "policypilot-streamlit-windows",
+      "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "streamlit", "run", "src/policypilot/app/streamlit_app.py", "--server.headless=true", "--server.port=8600"],
+      "port": 8600
     }
   ]
 }
