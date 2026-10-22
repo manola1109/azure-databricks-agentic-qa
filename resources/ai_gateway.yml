@@ -42,7 +42,7 @@ resources:
     gpt_oss:
       parent: schemas/${var.catalog}.filings
       model_service_id: gpt-oss
-      comment: PolicyPilot's governed LLM — routes to Groq gpt-oss-120b via the groq provider service
+      comment: policypilot's governed LLM — routes to Groq gpt-oss-120b via the groq provider service
       config:
         routing:
           destinations:

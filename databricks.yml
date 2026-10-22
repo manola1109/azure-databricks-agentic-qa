@@ -1,4 +1,4 @@
-# Databricks Asset Bundle for PolicyPilot.
+# Databricks Asset Bundle for policypilot.
 #
 # `dev` target is real and deployable (workspace, Unity Catalog, Key Vault, GitHub OIDC
 # all provisioned — see README "Status"). `staging`/`prod` hosts and run-as service
@@ -30,11 +30,11 @@ targets:
     mode: development
     default: true
     workspace:
-      host:  https://adb-7405614181918800.0.azuredatabricks.net
+      host:  https://adb-7405610309314277.17.azuredatabricks.net/
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: topsecretcatalog
-      admin_user: yashstudy02@gmail.com
+      admin_user: deepak.singh.m@gmail.com
 
   staging:
     mode: production

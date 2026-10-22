@@ -25,7 +25,7 @@ TICKERS = [
     "AAPL", "MSFT", "JPM", "GOOGL", "AMZN", "META", "NVDA", "TSLA", "JNJ", "V",
     "WMT", "CVX", "PG", "HD", "BAC", "KO", "PEP", "CSCO", "INTC", "DIS",
 ]
-USER_AGENT = "PolicyPilot research prototype yashstudy02@gmail.com"  # SEC requires a real contact
+USER_AGENT = "policypilot research prototype deepak.singh.m@gmail.com"  # SEC requires a real contact
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 session = requests.Session()

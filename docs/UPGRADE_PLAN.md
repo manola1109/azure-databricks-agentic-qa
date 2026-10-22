@@ -1,4 +1,4 @@
-# PolicyPilot Upgrade Plan
+# policypilot Upgrade Plan
 
 **Four decisions, two reversals** — 2026-09-02
 

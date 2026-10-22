@@ -71,7 +71,7 @@ def get_settings() -> Settings:
         env=os.environ.get("PP_ENV", "local"),
         groq_api_key=os.environ.get("GROQ_API_KEY") or None,
         sec_user_agent=os.environ.get(
-            "SEC_EDGAR_USER_AGENT", "PolicyPilot research prototype (no contact set)"
+            "SEC_EDGAR_USER_AGENT", "policypilot research prototype (no contact set)"
         ),
         databricks_host=os.environ.get("DATABRICKS_HOST") or None,
         databricks_token=os.environ.get("DATABRICKS_TOKEN") or None,

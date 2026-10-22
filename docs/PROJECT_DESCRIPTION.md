@@ -1,4 +1,4 @@
-# PolicyPilot — Project Description
+# policypilot — Project Description
 
 ## One-liner
 
@@ -7,7 +7,7 @@
 
 ## Short description
 
-**PolicyPilot** is a governed, agentic Q&A copilot for regulatory filings. Ask it about
+**policypilot** is a governed, agentic Q&A copilot for regulatory filings. Ask it about
 any of 20 large companies, such as *"What supply chain risks does Apple disclose?"*, and
 it answers from their latest SEC 10-K with a numbered citation for every claim. If it
 can't ground an answer in the filing, it refuses instead of guessing. It's built as a

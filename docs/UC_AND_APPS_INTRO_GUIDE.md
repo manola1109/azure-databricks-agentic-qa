@@ -1,7 +1,7 @@
-# Unity Catalog & Databricks Apps — Standalone Intro (No PolicyPilot Required)
+# Unity Catalog & Databricks Apps — Standalone Intro (No policypilot Required)
 
 A self-contained walkthrough for teaching Unity Catalog and Databricks Apps as general
-concepts, independent of the PolicyPilot project. Uses a workspace you've already created
+concepts, independent of the policypilot project. Uses a workspace you've already created
 in Azure. Everything here is disposable — a toy `demo_catalog` and a toy app you can
 delete when you're done.
 
@@ -159,7 +159,7 @@ grants.)
 **The punchline for your audience**: this exact "the app has its own identity, and that
 identity needs its own grants" moment is the single most common surprise people hit with
 Databricks Apps — and it's the same mechanism (just simpler) as the two-service-principal
-gotcha in the full PolicyPilot deployment.
+gotcha in the full policypilot deployment.
 
 ---
 

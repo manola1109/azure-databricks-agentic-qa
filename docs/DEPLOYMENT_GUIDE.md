@@ -1,6 +1,6 @@
-# PolicyPilot: Complete Build Guide — Local Prototype → Real Databricks/Azure Deployment
+# policypilot: Complete Build Guide — Local Prototype → Real Databricks/Azure Deployment
 
-This is a start-to-finish runbook for building PolicyPilot (a governed Q&A agent over SEC
+This is a start-to-finish runbook for building policypilot (a governed Q&A agent over SEC
 10-K filings) and deploying it for real on Azure Databricks. It's written from an actual
 build session, including every error we hit and exactly how to avoid or fix it — follow it
 in order and you shouldn't hit the same walls.
@@ -117,7 +117,7 @@ Run `uv sync --extra dev` to install.
 `"MyApp research prototype"` gets rejected; you need a real contact:
 
 ```python
-SEC_EDGAR_USER_AGENT = "PolicyPilot research prototype you@example.com"
+SEC_EDGAR_USER_AGENT = "policypilot research prototype you@example.com"
 ```
 
 Client hits three public, unauthenticated endpoints:
@@ -737,7 +737,7 @@ don't see that option, enable the **Unity Gateway** beta features on the account
 1. Built-in **safety** and **PII** guardrails (block), on input and output.
 2. **Off-topic guardrail**. Phase: `Input`. Action: `Block`. Policy prompt:
   > Flag this request if it is not about SEC 10-K filings, financial/regulatory
-  > disclosures, or one of the companies PolicyPilot has ingested filings for. Questions
+  > disclosures, or one of the companies policypilot has ingested filings for. Questions
   > about unrelated topics (general knowledge, personal advice, other companies not in the
   > corpus, etc.) should be flagged.
 3. **Investment-advice guardrail**. Phase: `Input`. Action: `Block`. Policy prompt:

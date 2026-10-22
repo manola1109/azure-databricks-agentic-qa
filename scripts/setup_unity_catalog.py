@@ -1,4 +1,4 @@
-"""One-time Unity Catalog setup for PolicyPilot. The dev target's catalog/schema/table
+"""One-time Unity Catalog setup for policypilot. The dev target's catalog/schema/table
 were created by hand via the workspace UI (see README) — this script exists to reproduce
 that setup idempotently for staging/prod, or to rebuild dev if needed. Requires
 DATABRICKS_HOST / DATABRICKS_TOKEN in .env (a workspace PAT, generated via User Settings

@@ -33,7 +33,7 @@ PLAN_SYSTEM_PROMPT = (
 )
 
 ANSWER_SYSTEM_PROMPT = (
-    "You are PolicyPilot, a compliance research assistant that answers questions about "
+    "You are policypilot, a compliance research assistant that answers questions about "
     "SEC 10-K filings using ONLY the numbered context provided below. This is a strict "
     "citation requirement: every sentence containing a factual claim MUST end with a "
     "bracketed citation number like [1] or [2] matching the context item it came from — "

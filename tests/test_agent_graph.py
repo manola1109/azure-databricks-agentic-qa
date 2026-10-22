@@ -28,7 +28,7 @@ class FakeLLM:
     def complete(self, system: str, messages: list[dict]) -> str:
         if system.startswith("You turn a user's question"):
             return json.dumps({"search_query": self._search_query, "ticker": self._ticker})
-        if system.startswith("You are PolicyPilot"):
+        if system.startswith("You are policypilot"):
             return self._answer
         raise AssertionError(f"Unexpected system prompt: {system[:50]!r}")
 

@@ -1,8 +1,8 @@
-# PolicyPilot
+# policypilot
 
 A governed regulatory/policy Q&A copilot — the first of three portfolio projects
 demonstrating agentic AI patterns on Databricks + Azure (Q&A, AI reviewer, generation).
-PolicyPilot answers questions about SEC 10-K filings and cites the filing every claim
+policypilot answers questions about SEC 10-K filings and cites the filing every claim
 came from, refusing rather than guessing when it can't ground an answer.
 
 ## Status

@@ -43,7 +43,7 @@ jobs:
     env:
       PP_ENV: local
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-      SEC_EDGAR_USER_AGENT: "PolicyPilot CI (ci@github-actions)"
+      SEC_EDGAR_USER_AGENT: "policypilot CI (ci@github-actions)"
     steps:
       - uses: actions/checkout@v4
 
