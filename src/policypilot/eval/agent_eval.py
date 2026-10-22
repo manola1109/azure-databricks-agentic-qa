@@ -15,6 +15,7 @@ same as the app), so it never depends on a live Databricks Vector Search endpoin
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 
@@ -93,8 +94,8 @@ def sample_dataset(dataset: list[dict], limit: int | None) -> list[dict]:
     return picked
 
 
-# Minimum mean score per scorer; below any of them (or a scorer that produced no score at
-# all, e.g. the judges couldn't be reached) the eval fails.
+# Minimum mean score per scorer. A scorer call that errored counts as a fail for that
+# question, so the gate can't pass just because the judges were unreachable.
 THRESHOLDS = {
     "citation_present": 0.9,
     "safety": 0.9,
@@ -102,17 +103,71 @@ THRESHOLDS = {
     "retrieval_groundedness": 0.7,
 }
 
+# Off-corpus questions are correctly answered with the refusal, which these judges score
+# as irrelevant/ungrounded by design; citation_present checks the refusal for them instead.
+SKIP_FOR_REFUSALS = {"relevance_to_query", "retrieval_groundedness"}
 
-def check_thresholds(metrics: dict, scorer_names: list[str]) -> list[str]:
-    failures = []
-    for name in scorer_names:
+
+def _cell(row: dict, key: str):
+    """A result_df cell, with pandas' NaN for empty cells turned into None."""
+    value = row.get(key)
+    return None if isinstance(value, float) and math.isnan(value) else value
+
+
+def _to_score(value) -> float | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return {"yes": 1.0, "no": 0.0}.get(value.strip().lower())
+    return float(value)
+
+
+def _agent_error(row: dict) -> str | None:
+    """The exception predict_fn raised for this question, if any (e.g. Groq 429s that
+    outlasted the retries), pulled from the trace's span events."""
+    if _cell(row, "response") is not None:
+        return None
+    for span in row.get("spans") or []:
+        for event in span.get("events") or []:
+            message = (event.get("attributes") or {}).get("exception.message")
+            if message:
+                return str(message)
+    return "agent returned no answer"
+
+
+def score_rows(rows: list[dict], refusal_questions: set[str], scorer_names: list[str]):
+    """Per-question scores plus the gate verdict. Each row is one result_df record;
+    returns (per-question lines, {scorer: mean}, failure messages)."""
+    lines, totals = [], {name: [] for name in scorer_names}
+    for row in rows:
+        question = (row.get("request") or {}).get("question", "?")
+        refused = question in refusal_questions
+        cells = []
+        for name in scorer_names:
+            if refused and name in SKIP_FOR_REFUSALS:
+                cells.append(f"{name}=skip")
+                continue
+            error = _cell(row, f"{name}/error_message")
+            score = None if error else _to_score(_cell(row, f"{name}/value"))
+            totals[name].append(score or 0.0)
+            if score is None:
+                cells.append(f"{name}=ERROR({error or 'no value'})")
+            else:
+                cells.append(f"{name}={'pass' if score >= 1 else 'FAIL'}")
+        agent_error = _agent_error(row)
+        prefix = f"[agent error: {agent_error}] " if agent_error else ""
+        lines.append(f"- {question}\n    {prefix}{', '.join(cells)}")
+
+    means, failures = {}, []
+    for name, scores in totals.items():
         minimum = float(os.environ.get(f"PP_EVAL_MIN_{name.upper()}", THRESHOLDS[name]))
-        score = metrics.get(f"{name}/mean")
-        if score is None:
-            failures.append(f"{name}: no score (every scorer call failed)")
-        elif score < minimum:
-            failures.append(f"{name}: {score:.2f} < {minimum:.2f}")
-    return failures
+        if not scores:
+            failures.append(f"{name}: no questions scored")
+            continue
+        means[name] = sum(scores) / len(scores)
+        if means[name] < minimum:
+            failures.append(f"{name}: {means[name]:.2f} < {minimum:.2f}")
+    return lines, means, failures
 
 
 def run_agent_eval() -> dict:
@@ -146,15 +201,19 @@ def run_agent_eval() -> dict:
 
     results = mlflow.genai.evaluate(data=data, predict_fn=predict_fn, scorers=scorers)
 
-    print(f"\nQuestions evaluated: {len(data)}")
-    print(results.metrics)
+    refusal_questions = {item["question"] for item in dataset if item["ticker"] is None}
+    lines, means, failures = score_rows(
+        results.result_df.to_dict("records"), refusal_questions, [s.name for s in scorers]
+    )
+    print(f"\nPer-question results ({len(data)} questions):")
+    print("\n".join(lines))
+    print("\nMean scores: " + ", ".join(f"{k}={v:.2f}" for k, v in means.items()))
 
-    failures = check_thresholds(results.metrics, [s.name for s in scorers])
     if failures:
         print("\nEval FAILED:\n  " + "\n  ".join(failures))
         sys.exit(1)
     print("\nEval passed all thresholds.")
-    return results.metrics
+    return means
 
 
 if __name__ == "__main__":

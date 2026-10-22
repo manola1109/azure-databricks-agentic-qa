@@ -49,6 +49,7 @@ jobs:
       PP_EVAL_LIMIT: "10"
       PP_GROQ_MAX_RETRIES: "10"
       MLFLOW_GENAI_EVAL_MAX_WORKERS: "1"
+      MLFLOW_GENAI_EVAL_MAX_RETRIES: "8" # judge 429s; default 3 gave up too early
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       # SEC returns 403 without a real contact email; kept in a secret so it isn't public.
       SEC_EDGAR_USER_AGENT: ${{ secrets.SEC_EDGAR_USER_AGENT }}
