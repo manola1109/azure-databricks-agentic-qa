@@ -41,8 +41,8 @@ class _TracedVectorStore:
         self._inner.upsert(ids, texts, metadatas)
 
     @mlflow.trace(span_type=SpanType.RETRIEVER)
-    def search(self, query: str, k: int = 5) -> list[SearchResult]:
-        results = self._inner.search(query, k=k)
+    def search(self, query: str, k: int = 5, ticker: str | None = None) -> list[SearchResult]:
+        results = self._inner.search(query, k=k, ticker=ticker)
         span = mlflow.get_current_active_span()
         if span is not None:
             span.set_outputs(

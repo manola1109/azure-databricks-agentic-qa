@@ -43,6 +43,7 @@ jobs:
       contents: read
     env:
       PP_ENV: local
+      PP_RETRIEVAL_K: "3" # Groq free tier caps requests at 8,000 tokens/minute
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       # SEC returns 403 without a real contact email; kept in a secret so it isn't public.
       SEC_EDGAR_USER_AGENT: ${{ secrets.SEC_EDGAR_USER_AGENT }}
