@@ -20,6 +20,9 @@ from policypilot.config import DEFAULT_TICKERS, RETRIEVAL_K
 from policypilot.retrieval.base import SearchResult, VectorStore
 
 CITATION_RE = re.compile(r"\[\d+\]")
+# gpt-oss sometimes cites with full-width brackets (e.g. 【1】 or 【1†L3-L5】) despite the
+# prompt; normalize those to [1] so a cited answer isn't refused for its bracket style.
+FULLWIDTH_CITATION_RE = re.compile(r"【(\d+)[^】]*】")
 
 PLAN_SYSTEM_PROMPT = (
     "You turn a user's question about SEC 10-K filings into a short search query "
@@ -90,7 +93,7 @@ def build_graph(llm: LLMClient, store: VectorStore):
         draft = llm.complete(
             system=system, messages=[{"role": "user", "content": state["question"]}]
         )
-        return {"draft_answer": draft}
+        return {"draft_answer": FULLWIDTH_CITATION_RE.sub(r"[\1]", draft)}
 
     def verify_node(state: AgentState) -> AgentState:
         draft = state["draft_answer"]

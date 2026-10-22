@@ -50,6 +50,17 @@ def test_agent_returns_grounded_answer_with_citation():
     assert result["final_answer"] == "Apple discloses supplier concentration risk [1]."
 
 
+def test_agent_normalizes_fullwidth_citations():
+    """gpt-oss sometimes writes 【1】 instead of [1]; that's still a citation, not a refusal."""
+    store = FakeStore([SAMPLE_RESULT])
+    llm = FakeLLM(answer="Amazon filed its 10-K on February 6, 2026【1†L2-L4】.")
+
+    result = ask(llm, store, "When was Amazon's most recent 10-K filed?")
+
+    assert result["grounded"] is True
+    assert result["final_answer"] == "Amazon filed its 10-K on February 6, 2026[1]."
+
+
 def test_agent_refuses_when_answer_has_no_citation():
     store = FakeStore([SAMPLE_RESULT])
     llm = FakeLLM(answer="Apple discloses supplier concentration risk.")  # no [1]

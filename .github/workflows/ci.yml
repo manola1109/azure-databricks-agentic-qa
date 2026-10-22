@@ -44,6 +44,11 @@ jobs:
     env:
       PP_ENV: local
       PP_RETRIEVAL_K: "3" # Groq free tier caps requests at 8,000 tokens/minute
+      # Groq's free tier also caps tokens/day, so CI evaluates a fixed 10-question sample
+      # (plus the off-corpus refusal check), one at a time, retrying 429s patiently.
+      PP_EVAL_LIMIT: "10"
+      PP_GROQ_MAX_RETRIES: "10"
+      MLFLOW_GENAI_EVAL_MAX_WORKERS: "1"
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       # SEC returns 403 without a real contact email; kept in a secret so it isn't public.
       SEC_EDGAR_USER_AGENT: ${{ secrets.SEC_EDGAR_USER_AGENT }}

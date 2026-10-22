@@ -39,6 +39,10 @@ GROQ_MODEL = "openai/gpt-oss-120b"
 # (8,000 tokens/minute) needs this lowered to 3 via PP_RETRIEVAL_K in .env.
 RETRIEVAL_K = int(os.environ.get("PP_RETRIEVAL_K", "5"))
 
+# Retries on Groq 429s (the SDK waits per the retry-after header between attempts). The
+# eval runs many questions back to back, so CI raises this via PP_GROQ_MAX_RETRIES.
+GROQ_MAX_RETRIES = int(os.environ.get("PP_GROQ_MAX_RETRIES", "2"))
+
 # Unity Catalog / Vector Search resource names — must match whatever's actually
 # provisioned in the workspace (see README "Next steps").
 UC_CATALOG = "topsecretcatalog"

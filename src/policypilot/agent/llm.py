@@ -10,7 +10,12 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from policypilot.config import AI_GATEWAY_MODEL_SERVICE, GROQ_MODEL, get_settings
+from policypilot.config import (
+    AI_GATEWAY_MODEL_SERVICE,
+    GROQ_MAX_RETRIES,
+    GROQ_MODEL,
+    get_settings,
+)
 
 
 class LLMClient(Protocol):
@@ -18,10 +23,10 @@ class LLMClient(Protocol):
 
 
 class GroqLLMClient:
-    def __init__(self, api_key: str, model: str = GROQ_MODEL):
+    def __init__(self, api_key: str, model: str = GROQ_MODEL, max_retries: int = GROQ_MAX_RETRIES):
         from groq import Groq
 
-        self._client = Groq(api_key=api_key)
+        self._client = Groq(api_key=api_key, max_retries=max_retries)
         self._model = model
 
     def complete(self, system: str, messages: list[dict]) -> str:
