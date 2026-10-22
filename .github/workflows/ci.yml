@@ -10,6 +10,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch: # "Run workflow" button: the only way to run agent-eval outside a PR
 
 jobs:
   lint-and-test:
@@ -35,6 +36,9 @@ jobs:
         run: uv run pytest
 
   agent-eval:
+    # Each run spends ~66k of the Groq free tier's 200k tokens/day, so it runs on PRs and
+    # manual runs only, not on every push to main.
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     needs: lint-and-test
     environment: ci
