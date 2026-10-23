@@ -117,6 +117,13 @@ for ticker in TICKERS:
 print(f"Total: {len(rows)} chunks across {len(TICKERS)} tickers")
 
 # COMMAND ----------
-df = spark.createDataFrame(rows)
+from pyspark.sql import functions as F
+
+# createDataFrame infers LONG / ARRAY<DOUBLE>, but the table is INT / ARRAY<FLOAT>; cast
+# every column to the table's own type so Delta's schema check accepts the append.
+target = spark.table(TABLE).schema
+df = spark.createDataFrame(rows).select(
+    [F.col(field.name).cast(field.dataType).alias(field.name) for field in target]
+)
 df.write.mode("append").saveAsTable(TABLE)
 display(spark.sql(f"SELECT ticker, company, filing_date, count(*) AS n_chunks FROM {TABLE} GROUP BY ALL"))
