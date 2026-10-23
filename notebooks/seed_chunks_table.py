@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Seed policypilot_dev.filings.chunks
+# MAGIC # Seed topsecretcatalouge.filing.chunks
 # MAGIC Self-contained: fetches the latest 10-K for a few tickers from SEC EDGAR (public,
 # MAGIC no auth), chunks + embeds them, and writes into the UC table so the Vector Search
 # MAGIC Delta-Sync index has real rows to sync. Deliberately doesn't import the `policypilot`
@@ -18,8 +18,8 @@ import requests
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
 
-CATALOG = "policypilot_dev"
-SCHEMA = "filings"
+CATALOG = "topsecretcatalouge"
+SCHEMA = "filing"
 TABLE = f"{CATALOG}.{SCHEMA}.chunks"
 TICKERS = [
     "AAPL", "MSFT", "JPM", "GOOGL", "AMZN", "META", "NVDA", "TSLA", "JNJ", "V",

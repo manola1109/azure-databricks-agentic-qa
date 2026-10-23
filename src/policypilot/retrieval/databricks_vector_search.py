@@ -1,10 +1,10 @@
 """Production VectorStore backend: Databricks Vector Search over a Delta-synced UC table.
 
-Uses self-managed embeddings (the `embedding` column in policypilot_dev.filings.chunks,
+Uses self-managed embeddings (the `embedding` column in the UC_CHUNKS_TABLE Delta table,
 computed with the same sentence-transformers model as local dev) so switching from
 LocalChromaVectorStore never changes embedding dimensionality or retrieval semantics —
 only where the vectors live. Provisioning is a one-time click-through in the workspace UI
-(create the endpoint + Delta-Sync index over policypilot_dev.filings.chunks with
+(create the endpoint + Delta-Sync index over UC_CHUNKS_TABLE with
 `embedding` as the embedding vector column) — see README "Next steps".
 
 New chunks are written directly to the Delta table (see notebooks/seed_chunks_table.py);
@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import os
 
-from policypilot.config import EMBEDDING_MODEL
+from policypilot.config import EMBEDDING_MODEL, UC_CHUNKS_TABLE
 from policypilot.retrieval.base import SearchResult
 
 RESULT_COLUMNS = ["chunk_id", "text", "ticker", "company", "filing_date", "accession_number"]
@@ -46,7 +46,7 @@ class DatabricksVectorSearchStore:
 
     def upsert(self, ids: list[str], texts: list[str], metadatas: list[dict]) -> None:
         raise NotImplementedError(
-            "Write new chunks to policypilot_dev.filings.chunks directly (see "
+            f"Write new chunks to {UC_CHUNKS_TABLE} directly (see "
             "notebooks/seed_chunks_table.py) — the Delta-Sync index picks up changes "
             "automatically via Change Data Feed."
         )

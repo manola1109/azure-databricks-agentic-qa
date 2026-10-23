@@ -1,7 +1,7 @@
 # Unity Gateway in front of Groq, as two Unity Catalog objects (DABs Beta resources):
 #
 #   model_provider_services.groq  -> holds Groq's base URL + API key, allowlists upstream models
-#   model_services.gpt_oss        -> what the App calls: <catalog>.filings.gpt-oss
+#   model_services.gpt_oss        -> what the App calls: <catalog>.filing.gpt-oss
 #
 # Why not a model_serving_endpoints external_model: its `name` field rejects "/" (400
 # INVALID_PARAMETER_VALUE), and every usable Groq model ID has one (openai/gpt-oss-120b).
@@ -19,7 +19,7 @@
 resources:
   model_provider_services:
     groq:
-      parent: schemas/${var.catalog}.filings
+      parent: schemas/${var.catalog}.filing
       model_provider_service_id: groq
       comment: Groq's OpenAI-compatible API (key injected from Azure Key Vault at deploy time)
       config:
@@ -40,7 +40,7 @@ resources:
 
   model_services:
     gpt_oss:
-      parent: schemas/${var.catalog}.filings
+      parent: schemas/${var.catalog}.filing
       model_service_id: gpt-oss
       comment: policypilot's governed LLM — routes to Groq gpt-oss-120b via the groq provider service
       config:
@@ -49,7 +49,7 @@ resources:
             - name: primary
               destination_type: DESTINATION_TYPE_EXTERNAL_FOUNDATION_MODEL
               external_model_config:
-                model_provider_service: model-provider-services/${var.catalog}.filings.groq
+                model_provider_service: model-provider-services/${var.catalog}.filing.groq
                 target:
                   model: openai/gpt-oss-120b
                   native_api_types: [openai/v1/chat/completions]

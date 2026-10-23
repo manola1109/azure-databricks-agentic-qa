@@ -45,8 +45,8 @@ GROQ_MAX_RETRIES = int(os.environ.get("PP_GROQ_MAX_RETRIES", "2"))
 
 # Unity Catalog / Vector Search resource names — must match whatever's actually
 # provisioned in the workspace (see README "Next steps").
-UC_CATALOG = "topsecretcatalog"
-UC_SCHEMA = "filings"
+UC_CATALOG = "topsecretcatalouge"
+UC_SCHEMA = "filing"
 UC_CHUNKS_TABLE = f"{UC_CATALOG}.{UC_SCHEMA}.chunks"
 VECTOR_SEARCH_ENDPOINT = "aiendpoint"
 VECTOR_SEARCH_INDEX = f"{UC_CATALOG}.{UC_SCHEMA}.topsecretindex"
