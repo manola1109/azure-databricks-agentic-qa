@@ -7,3 +7,6 @@ command: ["streamlit", "run", "src/policypilot/app/streamlit_app.py"]
 env:
   - name: "PP_ENV"
     value: "databricks"
+  # Groq's free tier caps requests at 8,000 tokens/minute; the default 5 chunks exceeds it.
+  - name: "PP_RETRIEVAL_K"
+    value: "3"
